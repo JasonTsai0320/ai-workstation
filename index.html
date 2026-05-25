@@ -866,9 +866,9 @@ async function loadWorkflow() {
     for (let i = 1; i < records.length; i++) {
       const cols = splitCSVLine(records[i]);
       if (!cols || cols.length < 3) continue;
-      const category = clean(cols[0]); // B欄
-      const name     = clean(cols[1]); // C欄
-      const sheetUrl = clean(cols[2]); // D欄
+      const category = clean(cols[1]); // B欄
+      const name     = clean(cols[2]); // C欄
+      const sheetUrl = clean(cols[3]); // D欄
       const sheetId  = extractSheetId(sheetUrl);
       if (!name) continue;
       items.push({ category, name, sheetId });
