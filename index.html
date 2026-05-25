@@ -188,16 +188,16 @@
   .cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 12px;
+    gap: 16px;
   }
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 16px;
+    border-radius: 16px;
+    padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 9px;
+    height: 380px;
     transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
     position: relative;
     overflow: hidden;
@@ -206,29 +206,38 @@
   .card:hover {
     box-shadow: var(--shadow-hover);
     transform: translateY(-2px);
-    border-color: var(--accent);
+    border-color: var(--border2);
   }
   .card-top-bar {
     position: absolute;
     top: 0; left: 0; right: 0;
-    height: 3px;
-    border-radius: 14px 14px 0 0;
+    height: 4px;
+    border-radius: 16px 16px 0 0;
   }
   .card-top-bar.writing { background: var(--writing); }
   .card-top-bar.lesson { background: var(--lesson); }
   .card-top-bar.learning { background: var(--learning); }
   .card-top-bar.tool { background: var(--tool); }
 
+  .card-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 20px 20px 0;
+    overflow: hidden;
+  }
   .card-tags {
     display: flex;
     gap: 5px;
     flex-wrap: wrap;
-    margin-top: 5px;
+    margin-top: 8px;
+    margin-bottom: 10px;
+    flex-shrink: 0;
   }
   .tag {
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 8px;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
     font-weight: 500;
   }
   .tag-writing { background: var(--writing-bg); color: var(--writing); }
@@ -241,15 +250,31 @@
   .tag-ai   { background: var(--accent-light); color: var(--accent); }
   .tag-def  { background: var(--surface2); color: var(--text2); }
 
-  .card-task { font-size: 10px; color: var(--text3); font-weight: 500; letter-spacing: 0.04em; }
-  .card-title { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.4; }
-  .card-desc { font-size: 12px; color: var(--text2); line-height: 1.65; flex: 1; }
+  .card-task { font-size: 10px; color: var(--text3); font-weight: 500; letter-spacing: 0.04em; margin-bottom: 4px; flex-shrink: 0; }
+  .card-title { font-size: 17px; font-weight: 700; color: var(--text); line-height: 1.35; margin-bottom: 12px; flex-shrink: 0; }
+  .card-desc {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.75;
+    flex: 1;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding-right: 4px;
+    min-height: 0;
+  }
+  .card-desc::-webkit-scrollbar { width: 4px; }
+  .card-desc::-webkit-scrollbar-track { background: transparent; }
+  .card-desc::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 
   .card-footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-top: 2px;
+    background: var(--surface);
+    flex-shrink: 0;
   }
   .step-badge {
     font-size: 10px;
@@ -262,21 +287,22 @@
   }
   .copy-btn {
     flex: 1;
-    padding: 8px 12px;
-    background: var(--accent);
+    padding: 10px 12px;
+    background: #2563eb;
     color: #fff;
     border: none;
-    border-radius: 8px;
-    font-size: 12px;
+    border-radius: 10px;
+    font-size: 13px;
     font-family: 'Noto Sans TC', sans-serif;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     transition: opacity 0.2s, transform 0.1s;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 5px;
-    box-shadow: 0 2px 8px rgba(124,111,247,0.2);
+    box-shadow: 0 2px 8px rgba(37,99,235,0.25);
+    letter-spacing: 0.02em;
   }
   .copy-btn:hover { opacity: 0.88; }
   .copy-btn:active { transform: scale(0.97); }
@@ -610,9 +636,11 @@ function parseCSV(text) {
     const title = clean(cols[3]);
     const aiTool = clean(cols[4]);
     const order = clean(cols[5]);
-    const content = clean(cols[6]);
-    const desc = clean(cols[7]);
-    if (!title || !content) continue;
+    const colG = clean(cols[6]);
+    const colH = clean(cols[7]);
+    const content = colG || colH || '無';
+    const desc = colG ? colH : '';
+    if (!title) continue;
     rows.push({ axis, mode, task, title, aiTool, order, content, desc });
   }
   return rows;
@@ -720,20 +748,20 @@ function renderCards(data) {
           .map(t=>`<span class="tag tag-ai">${t}</span>`).join('')
       : '';
     const stepBadge = d.order ? `<span class="step-badge">步驟 ${d.order}</span>` : '';
-    const desc = d.desc || (d.content.length > 70 ? d.content.substring(0,70)+'…' : d.content);
+    const desc = d.content || d.desc || '';
 
     return `
     <div class="card" onclick="openModal(${i})">
       <div class="card-top-bar ${barClass}"></div>
-      <div class="card-tags">${axisTag}${modeTag}${aiTags}</div>
-      <div>
+      <div class="card-inner">
+        <div class="card-tags">${axisTag}${modeTag}${aiTags}</div>
         <div class="card-task">${d.task || ''}</div>
         <div class="card-title">${d.title}</div>
+        <div class="card-desc">${desc}</div>
       </div>
-      <div class="card-desc">${desc}</div>
       <div class="card-footer">
         ${stepBadge}
-        <button class="copy-btn" onclick="event.stopPropagation();copyPrompt(this,${i})">📋 複製 Prompt</button>
+        <button class="copy-btn" onclick="event.stopPropagation();copyPrompt(this,${i})">複製 Prompt</button>
       </div>
     </div>`;
   }).join('');
