@@ -792,7 +792,8 @@ function renderCards(data) {
 
 function copyPrompt(btn, idx) {
   const d = window._filteredData[idx];
-  navigator.clipboard.writeText(d.content).then(() => {
+  const searchKey = d.content.slice(0, 15);
+  navigator.clipboard.writeText(searchKey).then(() => {
     btn.textContent = '✅ 已複製！';
     btn.classList.add('copied');
     showToast();
@@ -873,7 +874,8 @@ function closeModalOnOverlay(e) {
 
 function editPrompt(idx) {
   const d = window._filteredData[idx];
-  navigator.clipboard.writeText(d.title).then(() => {
+  const searchKey = d.content.slice(0, 15);
+  navigator.clipboard.writeText(searchKey).then(() => {
     showToast('📋 已複製標題，請在 Sheet 中按 Cmd+F 貼上搜尋');
     setTimeout(() => {
       window.open(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`, '_blank');
