@@ -643,10 +643,10 @@ async function loadData() {
 }
 
 function parseCSV(text) {
-  const lines = text.split('\n');
+  const records = splitCSVRecords(text);
   const rows = [];
-  for (let i = 1; i < lines.length; i++) {
-    const cols = splitCSVLine(lines[i]);
+  for (let i = 1; i < records.length; i++) {
+    const cols = splitCSVLine(records[i]);
     if (!cols || cols.length < 5) continue;
     const axis = clean(cols[0]);
     const mode = clean(cols[1]);
@@ -662,6 +662,28 @@ function parseCSV(text) {
     rows.push({ axis, mode, task, title, aiTool, order, content, desc });
   }
   return rows;
+}
+
+function splitCSVRecords(text) {
+  // Correctly split CSV records respecting quoted newlines
+  const records = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (c === '"') {
+      if (inQ && text[i+1] === '"') { cur += '"'; i++; }
+      else inQ = !inQ;
+      cur += c;
+    } else if ((c === '\n' || (c === '\r' && text[i+1] === '\n')) && !inQ) {
+      if (c === '\r') i++;
+      records.push(cur);
+      cur = '';
+    } else {
+      cur += c;
+    }
+  }
+  if (cur) records.push(cur);
+  return records;
 }
 
 function splitCSVLine(line) {
@@ -687,7 +709,7 @@ function clean(s) {
 function buildAllFilters() {
   buildDynamicFilter('axis', 'filterAxis', d => [d.axis]);
   buildDynamicFilter('mode', 'filterMode', d => [d.mode]);
-  buildDynamicFilter('ai',   'filterAI',   d => d.aiTool ? d.aiTool.split(/[\/,、\s]+/).map(t=>t.trim()).filter(Boolean) : []);
+  buildDynamicFilter('ai',   'filterAI',   d => d.aiTool ? d.aiTool.split(/[\/,、]+/).map(t=>t.trim()).filter(Boolean) : []);
 }
 
 function buildDynamicFilter(group, rowId, extractor) {
