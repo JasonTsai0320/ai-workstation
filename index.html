@@ -869,9 +869,8 @@ async function loadWorkflow() {
       const category = clean(cols[1]); // B欄
       const name     = clean(cols[2]); // C欄
       const sheetUrl = clean(cols[3]); // D欄
-      const sheetId  = extractSheetId(sheetUrl);
       if (!name) continue;
-      items.push({ category, name, sheetId });
+      items.push({ category, name, sheetUrl });
     }
     renderWorkflow(items);
   } catch(e) {
@@ -897,9 +896,9 @@ function renderWorkflow(items) {
     html += '<div class="workflow-grid">';
     list.forEach(item => {
       const icon = getAutoIcon(item.name);
-      const hasUrl = !!item.sheetId;
+      const hasUrl = !!item.sheetUrl;
       const onclick = hasUrl
-        ? `window.open('https://docs.google.com/spreadsheets/d/${item.sheetId}/edit','_blank')`
+        ? `window.open('${item.sheetUrl}','_blank')`
         : '';
       html += `
         <button class="workflow-btn${hasUrl ? '' : ' disabled'}" onclick="${onclick}">
