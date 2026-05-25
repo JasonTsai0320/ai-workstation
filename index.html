@@ -510,6 +510,18 @@
   }
   .modal-edit-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
   .card { cursor: pointer; }
+  .card-edit-btn {
+    width: 36px; height: 36px;
+    background: transparent;
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .card-edit-btn:hover { border-color: var(--accent); background: var(--accent-light); }
 </style>
 </head>
 <body>
@@ -533,22 +545,15 @@
     </div>
 
     <div class="filter-section">
-      <div class="filter-row">
+      <div class="filter-row" id="filterAxis">
         <span class="filter-label">主軸</span>
         <button class="chip active" data-group="axis" data-val="全部" onclick="setFilter('axis','全部')">全部</button>
-        <button class="chip" data-group="axis" data-val="寫作" onclick="setFilter('axis','寫作')">✍️ 寫作</button>
-        <button class="chip" data-group="axis" data-val="備課" onclick="setFilter('axis','備課')">📚 備課</button>
-        <button class="chip" data-group="axis" data-val="學習" onclick="setFilter('axis','學習')">🧠 學習</button>
-        <button class="chip" data-group="axis" data-val="工具" onclick="setFilter('axis','工具')">🔧 工具</button>
       </div>
-      <div class="filter-row">
+      <div class="filter-row" id="filterMode">
         <span class="filter-label">模式</span>
         <button class="chip active" data-group="mode" data-val="全部" onclick="setFilter('mode','全部')">全部</button>
-        <button class="chip" data-group="mode" data-val="AI 協思" onclick="setFilter('mode','AI 協思')">🤝 協思</button>
-        <button class="chip" data-group="mode" data-val="AI 協作" onclick="setFilter('mode','AI 協作')">⚙️ 協作</button>
-        <button class="chip" data-group="mode" data-val="AI 助理" onclick="setFilter('mode','AI 助理')">🤖 助理</button>
       </div>
-      <div class="filter-row">
+      <div class="filter-row" id="filterAI">
         <span class="filter-label">AI工具</span>
         <button class="chip active" data-group="ai" data-val="全部" onclick="setFilter('ai','全部')">全部</button>
       </div>
@@ -592,7 +597,6 @@
       <div class="modal-prompt-text" id="modalPrompt"></div>
     </div>
     <div class="modal-footer">
-      <button class="modal-edit-btn" id="modalEditBtn" onclick="openSheetForEdit()" title="在 Google Sheet 編輯">✏️</button>
       <button class="modal-copy-btn" id="modalCopyBtn" onclick="copyModalPrompt()">📋 複製 Prompt</button>
     </div>
   </div>
@@ -630,7 +634,7 @@ async function loadData() {
     const res = await fetch(CSV_URL);
     const text = await res.text();
     allData = parseCSV(text);
-    buildAIFilters();
+    buildAllFilters();
     filterCards();
   } catch(e) {
     document.getElementById('cardsGrid').innerHTML = `
@@ -680,21 +684,25 @@ function clean(s) {
   return s.trim().replace(/^"|"$/g, '').trim();
 }
 
-function buildAIFilters() {
+function buildAllFilters() {
+  buildDynamicFilter('axis', 'filterAxis', d => [d.axis]);
+  buildDynamicFilter('mode', 'filterMode', d => [d.mode]);
+  buildDynamicFilter('ai',   'filterAI',   d => d.aiTool ? d.aiTool.split(/[\/,、\s]+/).map(t=>t.trim()).filter(Boolean) : []);
+}
+
+function buildDynamicFilter(group, rowId, extractor) {
   const seen = new Set();
-  const row = document.querySelector('.filter-row:last-child');
+  const row = document.getElementById(rowId);
   allData.forEach(d => {
-    if (!d.aiTool) return;
-    d.aiTool.split(/[\/,、\s]+/).forEach(t => {
-      t = t.trim();
-      if (t && !seen.has(t)) {
-        seen.add(t);
+    extractor(d).forEach(val => {
+      if (val && !seen.has(val)) {
+        seen.add(val);
         const btn = document.createElement('button');
         btn.className = 'chip';
-        btn.dataset.group = 'ai';
-        btn.dataset.val = t;
-        btn.textContent = t;
-        btn.onclick = () => setFilter('ai', t);
+        btn.dataset.group = group;
+        btn.dataset.val = val;
+        btn.textContent = val;
+        btn.onclick = () => setFilter(group, val);
         row.appendChild(btn);
       }
     });
@@ -776,6 +784,7 @@ function renderCards(data) {
       <div class="card-footer">
         ${stepBadge}
         <button class="copy-btn" onclick="event.stopPropagation();copyPrompt(this,${i})">複製 Prompt</button>
+        <button class="card-edit-btn" onclick="event.stopPropagation();window.open('https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit','_blank')" title="在 Google Sheet 編輯">✏️</button>
       </div>
     </div>`;
   }).join('');
