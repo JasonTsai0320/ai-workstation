@@ -496,6 +496,20 @@
   }
   .modal-copy-btn:hover { opacity: 0.87; }
   .modal-copy-btn.copied { background: #10b981; }
+  .modal-edit-btn {
+    padding: 9px 16px;
+    background: transparent;
+    color: var(--text2);
+    border: 1.5px solid var(--border2);
+    border-radius: 9px;
+    font-size: 13px;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .modal-edit-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
   .card { cursor: pointer; }
 </style>
 </head>
@@ -579,6 +593,7 @@
       <div class="modal-prompt-text" id="modalPrompt"></div>
     </div>
     <div class="modal-footer">
+      <button class="modal-edit-btn" id="modalEditBtn" onclick="openSheetForEdit()">✏️ 開啟 Sheet 編輯</button>
       <button class="modal-copy-btn" id="modalCopyBtn" onclick="copyModalPrompt()">📋 複製 Prompt</button>
     </div>
   </div>
@@ -845,6 +860,11 @@ function closeModal() {
 
 function closeModalOnOverlay(e) {
   if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+function openSheetForEdit() {
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`;
+  window.open(url, '_blank');
 }
 
 function copyModalPrompt() {
