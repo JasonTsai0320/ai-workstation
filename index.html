@@ -386,6 +386,21 @@
   }
   .wf-name { flex: 1; line-height: 1.4; }
   .wf-arrow { color: var(--text3); font-size: 15px; }
+  .wf-category {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 1.2rem 0 0.5rem;
+    padding-left: 2px;
+  }
+  .wf-category:first-child { margin-top: 0; }
+  .workflow-btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
 
   /* Toast */
   .toast {
@@ -575,7 +590,7 @@
     <div class="workflow-intro">
       📂 點擊下方工作表按鈕，直接在 Google Sheet 中開啟對應的工作流程。
     </div>
-    <div class="workflow-grid" id="workflowGrid"></div>
+    <div id="workflowGrid"></div>
   </div>
 
 </div>
@@ -609,23 +624,11 @@ const SHEET_ID = '10NlenChALIPNVolMhdX7u_Rgg-4JXbnJesfglu2I5yY';
 const SHEET_NAME = encodeURIComponent('⓪AI提示詞');
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${SHEET_NAME}`;
 
-const WORKFLOW_SHEETS = [
-  { name: '課綱課名', icon: '📋' },
-  { name: '課程行銷', icon: '📣' },
-  { name: '永久筆記', icon: '📝' },
-  { name: '學習筆記', icon: '🧠' },
-  { name: '部落文章', icon: '✍️' },
-  { name: '撰新聞稿', icon: '📰' },
-  { name: '小樹風格', icon: '🌱' },
-  { name: '寫作輔助', icon: '💡' },
-  { name: '創作文章-P', icon: '🎨' },
-];
-
 let allData = [];
 let filters = { axis: '全部', mode: '全部', ai: '全部' };
 
 async function init() {
-  buildWorkflow();
+  await loadWorkflow();
   await loadData();
 }
 
@@ -830,17 +833,84 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-function buildWorkflow() {
-  document.getElementById('workflowGrid').innerHTML = WORKFLOW_SHEETS.map(w => `
-    <button class="workflow-btn" onclick="openSheet('${w.name}')">
-      <div class="wf-icon">${w.icon}</div>
-      <div class="wf-name">${w.name}</div>
-      <div class="wf-arrow">→</div>
-    </button>`).join('');
+const ICON_MAP = {
+  '課綱': '📋', '行銷': '📣', '筆記': '📝', '學習': '🧠',
+  '部落': '✍️', '新聞': '📰', '風格': '🌱', '寫作': '💡',
+  '創作': '🎨', '輔助': '💡', '資料': '📁', '工具': '🔧',
+  '提示': '🗂', '工作流': '⚡', 'NLM': '🔬', '暫用': '📌',
+};
+
+function getAutoIcon(name) {
+  for (const [key, icon] of Object.entries(ICON_MAP)) {
+    if (name.includes(key)) return icon;
+  }
+  return '📄';
 }
 
-function openSheet(name) {
-  window.open(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`, '_blank');
+function extractSheetId(url) {
+  if (!url) return '';
+  const m = url.match(/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  return m ? m[1] : '';
+}
+
+async function loadWorkflow() {
+  const grid = document.getElementById('workflowGrid');
+  grid.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:1rem;">載入中...</div>';
+  try {
+    const sheetName = encodeURIComponent('①工作流');
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${sheetName}`;
+    const res = await fetch(url);
+    const text = await res.text();
+    const records = splitCSVRecords(text);
+    const items = [];
+    for (let i = 1; i < records.length; i++) {
+      const cols = splitCSVLine(records[i]);
+      if (!cols || cols.length < 3) continue;
+      const category = clean(cols[0]); // B欄
+      const name     = clean(cols[1]); // C欄
+      const sheetUrl = clean(cols[2]); // D欄
+      const sheetId  = extractSheetId(sheetUrl);
+      if (!name) continue;
+      items.push({ category, name, sheetId });
+    }
+    renderWorkflow(items);
+  } catch(e) {
+    grid.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:1rem;">⚠️ 無法載入工作流資料</div>';
+  }
+}
+
+function renderWorkflow(items) {
+  const grid = document.getElementById('workflowGrid');
+  if (!items.length) { grid.innerHTML = ''; return; }
+
+  // Group by category
+  const groups = {};
+  items.forEach(item => {
+    const cat = item.category || '其他';
+    if (!groups[cat]) groups[cat] = [];
+    groups[cat].push(item);
+  });
+
+  let html = '';
+  for (const [cat, list] of Object.entries(groups)) {
+    html += `<div class="wf-category">${cat}</div>`;
+    html += '<div class="workflow-grid">';
+    list.forEach(item => {
+      const icon = getAutoIcon(item.name);
+      const hasUrl = !!item.sheetId;
+      const onclick = hasUrl
+        ? `window.open('https://docs.google.com/spreadsheets/d/${item.sheetId}/edit','_blank')`
+        : '';
+      html += `
+        <button class="workflow-btn${hasUrl ? '' : ' disabled'}" onclick="${onclick}">
+          <div class="wf-icon">${icon}</div>
+          <div class="wf-name">${item.name}</div>
+          <div class="wf-arrow">${hasUrl ? '→' : ''}</div>
+        </button>`;
+    });
+    html += '</div>';
+  }
+  grid.innerHTML = html;
 }
 
 function switchTab(tab) {
