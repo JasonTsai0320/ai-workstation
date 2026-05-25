@@ -784,7 +784,7 @@ function renderCards(data) {
       <div class="card-footer">
         ${stepBadge}
         <button class="copy-btn" onclick="event.stopPropagation();copyPrompt(this,${i})">複製 Prompt</button>
-        <button class="card-edit-btn" onclick="event.stopPropagation();window.open('https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit','_blank')" title="在 Google Sheet 編輯">✏️</button>
+        <button class="card-edit-btn" onclick="event.stopPropagation();editPrompt(${i})" title="複製標題並開啟 Google Sheet">✏️</button>
       </div>
     </div>`;
   }).join('');
@@ -800,8 +800,9 @@ function copyPrompt(btn, idx) {
   });
 }
 
-function showToast() {
+function showToast(msg) {
   const t = document.getElementById('toast');
+  t.textContent = msg || '✅ 已複製到剪貼簿！';
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
 }
@@ -868,6 +869,16 @@ function closeModal() {
 
 function closeModalOnOverlay(e) {
   if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+function editPrompt(idx) {
+  const d = window._filteredData[idx];
+  navigator.clipboard.writeText(d.title).then(() => {
+    showToast('📋 已複製標題，請在 Sheet 中按 Cmd+F 貼上搜尋');
+    setTimeout(() => {
+      window.open(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`, '_blank');
+    }, 600);
+  });
 }
 
 function openSheetForEdit() {
