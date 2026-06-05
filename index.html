@@ -179,16 +179,9 @@
   }
   .chip:hover { border-color: var(--accent); color: var(--accent); }
 
-  /* Active chip colors */
+  /* Active chip colors — 統一紫色單一規則 */
+  .chip.active { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
   .chip.active[data-val="全部"] { background: var(--surface2); color: var(--text); border-color: var(--border2); }
-  .chip.active[data-val="寫作"] { background: var(--writing-bg); color: var(--writing); border-color: var(--writing); }
-  .chip.active[data-val="備課"] { background: var(--lesson-bg); color: var(--lesson); border-color: var(--lesson); }
-  .chip.active[data-val="學習"] { background: var(--learning-bg); color: var(--learning); border-color: var(--learning); }
-  .chip.active[data-val="工具"] { background: var(--tool-bg); color: var(--tool); border-color: var(--tool); }
-  .chip.active[data-group="mode"] { background: var(--li-bg); color: var(--li); border-color: var(--li); }
-  .chip.active[data-group="mode"][data-val="全部"] { background: var(--surface2); color: var(--text); border-color: var(--border2); }
-  .chip.active[data-group="ai"] { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
-  .chip.active[data-group="ai"][data-val="全部"] { background: var(--surface2); color: var(--text); border-color: var(--border2); }
 
   /* 程流 分組標題 */
   .flow-group-title {
@@ -774,17 +767,17 @@ function parseCSV(text) {
   const rows = [];
   for (let i = 1; i < records.length; i++) {
     const cols = splitCSVLine(records[i]);
-    if (!cols || cols.length < 5) continue;
-    const axis = clean(cols[0]);
-    const mode = clean(cols[1]);
-    const task = clean(cols[2]);
-    const title = clean(cols[3]);
-    const aiTool = clean(cols[4]);
-    const order = clean(cols[5]);
-    const colG = clean(cols[6]);
-    const colH = clean(cols[7]);
-    const content = colG || colH || '無';
-    const desc = colG ? colH : '';
+    if (!cols || cols.length < 7) continue;
+    const axis   = clean(cols[2]);  // C欄
+    const mode   = clean(cols[3]);  // D欄
+    const task   = clean(cols[4]);  // E欄
+    const title  = clean(cols[5]);  // F欄
+    const aiTool = clean(cols[6]);  // G欄
+    const order  = clean(cols[7]);  // H欄
+    const colI   = clean(cols[8]);  // I欄
+    const colJ   = clean(cols[9]);  // J欄
+    const content = colI || colJ || '無';
+    const desc = colI ? colJ : '';
     if (!title) continue;
     rows.push({ axis, mode, task, title, aiTool, order, content, desc });
   }
