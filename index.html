@@ -34,6 +34,11 @@
     --li: #5b44c4;
     --shadow: 0 2px 12px rgba(124,111,247,0.07);
     --shadow-hover: 0 6px 24px rgba(124,111,247,0.13);
+    /* 程流提示詞 橙色系 */
+    --flow: #f59e0b;
+    --flow-light: #fef3cd;
+    --flow-shadow: 0 2px 12px rgba(245,158,11,0.10);
+    --flow-shadow-hover: 0 6px 24px rgba(245,158,11,0.18);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -90,6 +95,11 @@
     color: #fff;
     box-shadow: 0 2px 8px rgba(124,111,247,0.25);
   }
+  /* 程流 tab active 橙色 */
+  .tab-btn.active.tab-flow {
+    background: var(--flow);
+    box-shadow: 0 2px 8px rgba(245,158,11,0.30);
+  }
 
   /* Main */
   .main { padding: 1.5rem 2rem 3rem; max-width: 1400px; margin: 0 auto; }
@@ -115,6 +125,10 @@
   .search-input:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px var(--accent-light);
+  }
+  .search-input.flow-search:focus {
+    border-color: var(--flow);
+    box-shadow: 0 0 0 3px var(--flow-light);
   }
   .search-input::placeholder { color: var(--text3); }
   .search-icon {
@@ -176,6 +190,11 @@
   .chip.active[data-group="ai"] { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
   .chip.active[data-group="ai"][data-val="全部"] { background: var(--surface2); color: var(--text); border-color: var(--border2); }
 
+  /* 程流 chip */
+  .flow-chip:hover { border-color: var(--flow); color: var(--flow); }
+  .flow-chip.active[data-val="全部"] { background: var(--surface2); color: var(--text); border-color: var(--border2); }
+  .flow-chip.active:not([data-val="全部"]) { background: var(--flow-light); color: var(--flow); border-color: var(--flow); }
+
   /* Stats */
   .stats-bar {
     font-size: 12px;
@@ -183,6 +202,7 @@
     margin-bottom: 1rem;
   }
   .stats-bar span { color: var(--accent); font-weight: 700; }
+  .stats-bar.flow-stats span { color: var(--flow); }
 
   /* Cards */
   .cards-grid {
@@ -208,6 +228,11 @@
     transform: translateY(-2px);
     border-color: var(--border2);
   }
+  /* 程流卡片 hover */
+  .card.flow-card:hover {
+    box-shadow: var(--flow-shadow-hover);
+    border-color: #f5c261;
+  }
   .card-top-bar {
     position: absolute;
     top: 0; left: 0; right: 0;
@@ -218,6 +243,7 @@
   .card-top-bar.lesson { background: var(--lesson); }
   .card-top-bar.learning { background: var(--learning); }
   .card-top-bar.tool { background: var(--tool); }
+  .card-top-bar.flow-bar { background: var(--flow); }
 
   .card-inner {
     display: flex;
@@ -249,6 +275,7 @@
   .tag-li   { background: var(--li-bg);  color: var(--li);  }
   .tag-ai   { background: var(--accent-light); color: var(--accent); }
   .tag-def  { background: var(--surface2); color: var(--text2); }
+  .tag-flow { background: var(--flow-light); color: var(--flow); }
 
   .card-task { font-size: 10px; color: var(--text3); font-weight: 500; letter-spacing: 0.04em; margin-bottom: 4px; flex-shrink: 0; }
   .card-title { font-size: 17px; font-weight: 700; color: var(--text); line-height: 1.35; margin-bottom: 12px; flex-shrink: 0; }
@@ -278,12 +305,13 @@
   }
   .step-badge {
     font-size: 10px;
-    color: var(--text3);
-    background: var(--surface2);
-    border: 1px solid var(--border);
+    color: #fff;
+    background: var(--flow);
+    border: none;
     padding: 3px 9px;
     border-radius: 6px;
     white-space: nowrap;
+    font-weight: 600;
   }
   .copy-btn {
     flex: 1;
@@ -308,6 +336,13 @@
   .copy-btn:active { transform: scale(0.97); }
   .copy-btn.copied { background: #10b981; box-shadow: 0 2px 8px rgba(16,185,129,0.25); }
 
+  /* 程流複製按鈕 橙色 */
+  .copy-btn.flow-copy {
+    background: var(--flow);
+    box-shadow: 0 2px 8px rgba(245,158,11,0.28);
+  }
+  .copy-btn.flow-copy.copied { background: #10b981; }
+
   /* Empty / Loading */
   .empty, .loading {
     grid-column: 1/-1;
@@ -330,11 +365,27 @@
     40% { transform:scale(1); opacity:1; }
   }
 
-  /* Workflow */
+  /* Sections */
   .workflow-section { display: none; }
   .workflow-section.active { display: block; }
   .prompt-section { display: none; }
   .prompt-section.active { display: block; }
+  .flow-section { display: none; }
+  .flow-section.active { display: block; }
+
+  /* 程流區塊頂部橙色提示 */
+  .flow-header-bar {
+    background: linear-gradient(90deg, var(--flow-light) 0%, #fff8e1 100%);
+    border: 1px solid #f5d08a;
+    border-radius: 12px;
+    padding: 10px 16px;
+    margin-bottom: 1.25rem;
+    font-size: 13px;
+    color: #92600a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 
   .workflow-intro {
     font-size: 13px;
@@ -511,6 +562,8 @@
   }
   .modal-copy-btn:hover { opacity: 0.87; }
   .modal-copy-btn.copied { background: #10b981; }
+  .modal-copy-btn.flow-modal-copy { background: var(--flow); box-shadow: 0 2px 8px rgba(245,158,11,0.22); }
+  .modal-copy-btn.flow-modal-copy.copied { background: #10b981; }
   .modal-edit-btn {
     width: 38px; height: 38px;
     background: transparent;
@@ -544,21 +597,20 @@
 <div class="header">
   <div class="logo">🚀 AI <span>工作站</span></div>
   <div class="tab-nav">
-    <button class="tab-btn active" onclick="switchTab('prompt')">🗂 提示詞庫</button>
-    <button class="tab-btn" onclick="switchTab('workflow')">⚡ 工作流程</button>
+    <button class="tab-btn active" onclick="switchTab('prompt')">🗂 單項提示詞</button>
+    <button class="tab-btn" onclick="switchTab('flow')">⚡ 程流提示詞</button>
+    <button class="tab-btn" onclick="switchTab('workflow')">📂 工作流檔案</button>
   </div>
 </div>
 
 <div class="main">
 
-  <!-- Prompt Section -->
+  <!-- 單項提示詞 Section -->
   <div class="prompt-section active" id="promptSection">
-
     <div class="search-wrap">
       <span class="search-icon">🔍</span>
       <input class="search-input" type="text" id="searchInput" placeholder="搜尋提示詞名稱、任務或內容關鍵字..." oninput="filterCards()">
     </div>
-
     <div class="filter-section">
       <div class="filter-row" id="filterAxis">
         <span class="filter-label">主軸</span>
@@ -573,7 +625,6 @@
         <button class="chip active" data-group="ai" data-val="全部" onclick="setFilter('ai','全部')">全部</button>
       </div>
     </div>
-
     <div class="stats-bar" id="statsBar"></div>
     <div class="cards-grid" id="cardsGrid">
       <div class="loading">
@@ -585,7 +636,41 @@
     </div>
   </div>
 
-  <!-- Workflow Section -->
+  <!-- 程流提示詞 Section -->
+  <div class="flow-section" id="flowSection">
+    <div class="flow-header-bar">
+      ⚡ 以下為有步驟順序的提示詞，請依序使用以獲得最佳效果。
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input flow-search" type="text" id="flowSearchInput" placeholder="搜尋程流提示詞名稱、任務或內容關鍵字..." oninput="filterFlowCards()">
+    </div>
+    <div class="filter-section">
+      <div class="filter-row" id="flowFilterAxis">
+        <span class="filter-label">主軸</span>
+        <button class="chip flow-chip active" data-group="flow-axis" data-val="全部" onclick="setFlowFilter('axis','全部')">全部</button>
+      </div>
+      <div class="filter-row" id="flowFilterMode">
+        <span class="filter-label">模式</span>
+        <button class="chip flow-chip active" data-group="flow-mode" data-val="全部" onclick="setFlowFilter('mode','全部')">全部</button>
+      </div>
+      <div class="filter-row" id="flowFilterAI">
+        <span class="filter-label">AI工具</span>
+        <button class="chip flow-chip active" data-group="flow-ai" data-val="全部" onclick="setFlowFilter('ai','全部')">全部</button>
+      </div>
+    </div>
+    <div class="stats-bar flow-stats" id="flowStatsBar"></div>
+    <div class="cards-grid" id="flowCardsGrid">
+      <div class="loading">
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+        <p style="margin-top:1rem;font-size:13px;">正在讀取資料...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 工作流檔案 Section -->
   <div class="workflow-section" id="workflowSection">
     <div class="workflow-intro">
       📂 點擊下方工作表按鈕，直接在 Google Sheet 中開啟對應的工作流程。
@@ -613,6 +698,7 @@
     </div>
     <div class="modal-footer">
       <button class="modal-copy-btn" id="modalCopyBtn" onclick="copyModalPrompt()">📋 複製 Prompt</button>
+      <button class="modal-edit-btn" id="modalEditBtn" onclick="editModalPrompt()" title="複製並開啟 Google Sheet">✏️</button>
     </div>
   </div>
 </div>
@@ -625,7 +711,11 @@ const SHEET_NAME = encodeURIComponent('⓪AI提示詞');
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${SHEET_NAME}`;
 
 let allData = [];
+let flowData = [];
+let singleData = [];
+
 let filters = { axis: '全部', mode: '全部', ai: '全部' };
+let flowFilters = { axis: '全部', mode: '全部', ai: '全部' };
 
 async function init() {
   await loadWorkflow();
@@ -637,11 +727,18 @@ async function loadData() {
     const res = await fetch(CSV_URL);
     const text = await res.text();
     allData = parseCSV(text);
+    // 分流：有 order 的是程流，沒有的是單項
+    flowData = allData.filter(d => d.order && d.order.toString().trim() !== '');
+    singleData = allData.filter(d => !d.order || d.order.toString().trim() === '');
     buildAllFilters();
+    buildAllFlowFilters();
     filterCards();
+    filterFlowCards();
   } catch(e) {
     document.getElementById('cardsGrid').innerHTML = `
       <div class="empty">⚠️<br><br>無法讀取資料，請確認 Google Sheet 已設為公開檢視</div>`;
+    document.getElementById('flowCardsGrid').innerHTML = `
+      <div class="empty">⚠️<br><br>無法讀取資料</div>`;
   }
 }
 
@@ -668,7 +765,6 @@ function parseCSV(text) {
 }
 
 function splitCSVRecords(text) {
-  // Correctly split CSV records respecting quoted newlines
   const records = [];
   let cur = '', inQ = false;
   for (let i = 0; i < text.length; i++) {
@@ -709,25 +805,37 @@ function clean(s) {
   return s.trim().replace(/^"|"$/g, '').trim();
 }
 
+// ─── 單項提示詞 filters ───
 function buildAllFilters() {
-  buildDynamicFilter('axis', 'filterAxis', d => [d.axis]);
-  buildDynamicFilter('mode', 'filterMode', d => [d.mode]);
-  buildDynamicFilter('ai',   'filterAI',   d => d.aiTool ? d.aiTool.split(/[\/,、]+/).map(t=>t.trim()).filter(Boolean) : []);
+  buildDynamicFilter('axis', 'filterAxis', d => [d.axis], singleData, false);
+  buildDynamicFilter('mode', 'filterMode', d => [d.mode], singleData, false);
+  buildDynamicFilter('ai',   'filterAI',   d => d.aiTool ? d.aiTool.split(/[\/,、]+/).map(t=>t.trim()).filter(Boolean) : [], singleData, false);
 }
 
-function buildDynamicFilter(group, rowId, extractor) {
+// ─── 程流提示詞 filters ───
+function buildAllFlowFilters() {
+  buildDynamicFilter('flow-axis', 'flowFilterAxis', d => [d.axis], flowData, true);
+  buildDynamicFilter('flow-mode', 'flowFilterMode', d => [d.mode], flowData, true);
+  buildDynamicFilter('flow-ai',   'flowFilterAI',   d => d.aiTool ? d.aiTool.split(/[\/,、]+/).map(t=>t.trim()).filter(Boolean) : [], flowData, true);
+}
+
+function buildDynamicFilter(group, rowId, extractor, dataset, isFlow) {
   const seen = new Set();
   const row = document.getElementById(rowId);
-  allData.forEach(d => {
+  dataset.forEach(d => {
     extractor(d).forEach(val => {
       if (val && !seen.has(val)) {
         seen.add(val);
         const btn = document.createElement('button');
-        btn.className = 'chip';
+        btn.className = isFlow ? 'chip flow-chip' : 'chip';
         btn.dataset.group = group;
         btn.dataset.val = val;
         btn.textContent = val;
-        btn.onclick = () => setFilter(group, val);
+        if (isFlow) {
+          btn.onclick = () => setFlowFilter(group.replace('flow-',''), val);
+        } else {
+          btn.onclick = () => setFilter(group, val);
+        }
         row.appendChild(btn);
       }
     });
@@ -742,9 +850,18 @@ function setFilter(group, val) {
   filterCards();
 }
 
+function setFlowFilter(group, val) {
+  flowFilters[group] = val;
+  const dataGroup = 'flow-' + group;
+  document.querySelectorAll(`.chip[data-group="${dataGroup}"]`).forEach(c => {
+    c.classList.toggle('active', c.dataset.val === val);
+  });
+  filterFlowCards();
+}
+
 function filterCards() {
   const q = document.getElementById('searchInput').value.toLowerCase();
-  const filtered = allData.filter(d => {
+  const filtered = singleData.filter(d => {
     if (filters.axis !== '全部' && d.axis !== filters.axis) return false;
     if (filters.mode !== '全部') {
       const mn = d.mode.replace(/\s/g,'');
@@ -757,7 +874,25 @@ function filterCards() {
     }
     return true;
   });
-  renderCards(filtered);
+  renderCards(filtered, 'cardsGrid', 'statsBar', false);
+}
+
+function filterFlowCards() {
+  const q = document.getElementById('flowSearchInput').value.toLowerCase();
+  const filtered = flowData.filter(d => {
+    if (flowFilters.axis !== '全部' && d.axis !== flowFilters.axis) return false;
+    if (flowFilters.mode !== '全部') {
+      const mn = d.mode.replace(/\s/g,'');
+      const fn = flowFilters.mode.replace(/\s/g,'');
+      if (!mn.includes(fn.replace('AI',''))) return false;
+    }
+    if (flowFilters.ai !== '全部' && !d.aiTool.includes(flowFilters.ai)) return false;
+    if (q) {
+      if (!(d.title+d.task+d.desc+d.content).toLowerCase().includes(q)) return false;
+    }
+    return true;
+  });
+  renderCards(filtered, 'flowCardsGrid', 'flowStatsBar', true);
 }
 
 function getAxisTag(axis) {
@@ -776,10 +911,14 @@ function getModeTag(mode) {
   return 'tag-def';
 }
 
-function renderCards(data) {
-  const grid = document.getElementById('cardsGrid');
-  document.getElementById('statsBar').innerHTML = `共 <span>${data.length}</span> 個提示詞`;
-  window._filteredData = data;
+function renderCards(data, gridId, statsId, isFlow) {
+  const grid = document.getElementById(gridId);
+  document.getElementById(statsId).innerHTML = `共 <span>${data.length}</span> 個提示詞`;
+  if (isFlow) {
+    window._filteredFlowData = data;
+  } else {
+    window._filteredData = data;
+  }
 
   if (!data.length) {
     grid.innerHTML = `<div class="empty">🔍<br><br>找不到符合條件的提示詞</div>`;
@@ -787,8 +926,10 @@ function renderCards(data) {
   }
 
   grid.innerHTML = data.map((d, i) => {
-    const barClass = getAxisBar(d.axis);
-    const axisTag = `<span class="tag ${getAxisTag(d.axis)}">${d.axis}</span>`;
+    const barClass = isFlow ? 'flow-bar' : getAxisBar(d.axis);
+    const axisTag = isFlow
+      ? `<span class="tag tag-flow">${d.axis}</span>`
+      : `<span class="tag ${getAxisTag(d.axis)}">${d.axis}</span>`;
     const modeTag = d.mode ? `<span class="tag ${getModeTag(d.mode)}">${d.mode}</span>` : '';
     const aiTags = d.aiTool
       ? d.aiTool.split(/[\/,、]+/).map(t=>t.trim()).filter(Boolean)
@@ -796,9 +937,18 @@ function renderCards(data) {
       : '';
     const stepBadge = d.order ? `<span class="step-badge">步驟 ${d.order}</span>` : '';
     const desc = d.content || d.desc || '';
+    const copyBtnClass = isFlow ? 'copy-btn flow-copy' : 'copy-btn';
+    const cardClass = isFlow ? 'card flow-card' : 'card';
+    const onClickModal = isFlow ? `openModal(${i}, true)` : `openModal(${i}, false)`;
+    const onClickCopy = isFlow
+      ? `event.stopPropagation();copyPrompt(this,${i},true)`
+      : `event.stopPropagation();copyPrompt(this,${i},false)`;
+    const onClickEdit = isFlow
+      ? `event.stopPropagation();editPrompt(${i},true)`
+      : `event.stopPropagation();editPrompt(${i},false)`;
 
     return `
-    <div class="card" onclick="openModal(${i})">
+    <div class="${cardClass}" onclick="${onClickModal}">
       <div class="card-top-bar ${barClass}"></div>
       <div class="card-inner">
         <div class="card-tags">${axisTag}${modeTag}${aiTags}</div>
@@ -808,17 +958,17 @@ function renderCards(data) {
       </div>
       <div class="card-footer">
         ${stepBadge}
-        <button class="copy-btn" onclick="event.stopPropagation();copyPrompt(this,${i})">複製 Prompt</button>
-        <button class="card-edit-btn" onclick="event.stopPropagation();editPrompt(${i})" title="複製標題並開啟 Google Sheet">✏️</button>
+        <button class="${copyBtnClass}" onclick="${onClickCopy}">📋 複製 Prompt</button>
+        <button class="card-edit-btn" onclick="${onClickEdit}" title="複製並開啟 Google Sheet">✏️</button>
       </div>
     </div>`;
   }).join('');
 }
 
-function copyPrompt(btn, idx) {
-  const d = window._filteredData[idx];
-  const searchKey = d.content.slice(0, 15);
-  navigator.clipboard.writeText(searchKey).then(() => {
+// ─── Bug fix: 複製完整 content ───
+function copyPrompt(btn, idx, isFlow) {
+  const d = isFlow ? window._filteredFlowData[idx] : window._filteredData[idx];
+  navigator.clipboard.writeText(d.content).then(() => {
     btn.textContent = '✅ 已複製！';
     btn.classList.add('copied');
     showToast();
@@ -847,12 +997,6 @@ function getAutoIcon(name) {
   return '📄';
 }
 
-function extractSheetId(url) {
-  if (!url) return '';
-  const m = url.match(/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
-  return m ? m[1] : '';
-}
-
 async function loadWorkflow() {
   const grid = document.getElementById('workflowGrid');
   grid.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:1rem;">載入中...</div>';
@@ -866,9 +1010,9 @@ async function loadWorkflow() {
     for (let i = 1; i < records.length; i++) {
       const cols = splitCSVLine(records[i]);
       if (!cols || cols.length < 3) continue;
-      const category = clean(cols[1]); // B欄
-      const name     = clean(cols[2]); // C欄
-      const sheetUrl = clean(cols[3]); // D欄
+      const category = clean(cols[1]);
+      const name     = clean(cols[2]);
+      const sheetUrl = clean(cols[3]);
       if (!name) continue;
       items.push({ category, name, sheetUrl });
     }
@@ -881,15 +1025,12 @@ async function loadWorkflow() {
 function renderWorkflow(items) {
   const grid = document.getElementById('workflowGrid');
   if (!items.length) { grid.innerHTML = ''; return; }
-
-  // Group by category
   const groups = {};
   items.forEach(item => {
     const cat = item.category || '其他';
     if (!groups[cat]) groups[cat] = [];
     groups[cat].push(item);
   });
-
   let html = '';
   for (const [cat, list] of Object.entries(groups)) {
     html += `<div class="wf-category">${cat}</div>`;
@@ -897,9 +1038,7 @@ function renderWorkflow(items) {
     list.forEach(item => {
       const icon = getAutoIcon(item.name);
       const hasUrl = !!item.sheetUrl;
-      const onclick = hasUrl
-        ? `window.open('${item.sheetUrl}','_blank')`
-        : '';
+      const onclick = hasUrl ? `window.open('${item.sheetUrl}','_blank')` : '';
       html += `
         <button class="workflow-btn${hasUrl ? '' : ' disabled'}" onclick="${onclick}">
           <div class="wf-icon">${icon}</div>
@@ -913,18 +1052,27 @@ function renderWorkflow(items) {
 }
 
 function switchTab(tab) {
-  document.querySelectorAll('.tab-btn').forEach((b,i) => {
-    b.classList.toggle('active', (i===0&&tab==='prompt')||(i===1&&tab==='workflow'));
-  });
-  document.getElementById('promptSection').classList.toggle('active', tab==='prompt');
-  document.getElementById('workflowSection').classList.toggle('active', tab==='workflow');
+  const btns = document.querySelectorAll('.tab-btn');
+  btns.forEach(b => b.classList.remove('active', 'tab-flow'));
+  if (tab === 'prompt') {
+    btns[0].classList.add('active');
+  } else if (tab === 'flow') {
+    btns[1].classList.add('active', 'tab-flow');
+  } else {
+    btns[2].classList.add('active');
+  }
+  document.getElementById('promptSection').classList.toggle('active', tab === 'prompt');
+  document.getElementById('flowSection').classList.toggle('active', tab === 'flow');
+  document.getElementById('workflowSection').classList.toggle('active', tab === 'workflow');
 }
 
 let _modalData = null;
+let _modalIsFlow = false;
 
-function openModal(idx) {
-  const d = window._filteredData[idx];
+function openModal(idx, isFlow) {
+  const d = isFlow ? window._filteredFlowData[idx] : window._filteredData[idx];
   _modalData = d;
+  _modalIsFlow = isFlow;
   document.getElementById('modalTitle').textContent = d.title;
   document.getElementById('modalTask').textContent = d.task || '';
   document.getElementById('modalPrompt').textContent = d.content;
@@ -938,17 +1086,27 @@ function openModal(idx) {
   }
 
   // Tags
-  const axisTag = `<span class="tag ${getAxisTag(d.axis)}">${d.axis}</span>`;
+  const axisTag = isFlow
+    ? `<span class="tag tag-flow">${d.axis}</span>`
+    : `<span class="tag ${getAxisTag(d.axis)}">${d.axis}</span>`;
   const modeTag = d.mode ? `<span class="tag ${getModeTag(d.mode)}">${d.mode}</span>` : '';
   const aiTags = d.aiTool
     ? d.aiTool.split(/[\/,、]+/).map(t=>t.trim()).filter(Boolean)
         .map(t=>`<span class="tag tag-ai">${t}</span>`).join('')
     : '';
-  document.getElementById('modalTags').innerHTML = axisTag + modeTag + aiTags;
+  // 步驟 badge（程流）
+  const stepBadge = (isFlow && d.order) ? `<span class="step-badge" style="font-size:12px;padding:4px 12px;">步驟 ${d.order}</span>` : '';
+  document.getElementById('modalTags').innerHTML = axisTag + modeTag + aiTags + stepBadge;
 
+  // 複製按鈕顏色
   const btn = document.getElementById('modalCopyBtn');
   btn.textContent = '📋 複製 Prompt';
   btn.classList.remove('copied');
+  if (isFlow) {
+    btn.classList.add('flow-modal-copy');
+  } else {
+    btn.classList.remove('flow-modal-copy');
+  }
 
   document.getElementById('modalOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -963,22 +1121,29 @@ function closeModalOnOverlay(e) {
   if (e.target === document.getElementById('modalOverlay')) closeModal();
 }
 
-function editPrompt(idx) {
-  const d = window._filteredData[idx];
-  const searchKey = d.content.slice(0, 15);
-  navigator.clipboard.writeText(searchKey).then(() => {
-    showToast('📋 已複製標題，請在 Sheet 中按 Cmd+F 貼上搜尋');
+// ─── Bug fix: editPrompt 複製完整 content ───
+function editPrompt(idx, isFlow) {
+  const d = isFlow ? window._filteredFlowData[idx] : window._filteredData[idx];
+  navigator.clipboard.writeText(d.content).then(() => {
+    showToast('📋 已複製 Prompt，請在 Sheet 中按 Cmd+F 貼上搜尋');
     setTimeout(() => {
       window.open(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`, '_blank');
     }, 600);
   });
 }
 
-function openSheetForEdit() {
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`;
-  window.open(url, '_blank');
+// ─── Modal 編輯按鈕 ───
+function editModalPrompt() {
+  if (!_modalData) return;
+  navigator.clipboard.writeText(_modalData.content).then(() => {
+    showToast('📋 已複製 Prompt，請在 Sheet 中按 Cmd+F 貼上搜尋');
+    setTimeout(() => {
+      window.open(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`, '_blank');
+    }, 600);
+  });
 }
 
+// ─── Bug fix: copyModalPrompt 複製完整 content ───
 function copyModalPrompt() {
   if (!_modalData) return;
   navigator.clipboard.writeText(_modalData.content).then(() => {
@@ -990,7 +1155,6 @@ function copyModalPrompt() {
   });
 }
 
-// Close modal on Escape key
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
 init();
