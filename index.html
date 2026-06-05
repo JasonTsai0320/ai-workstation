@@ -190,7 +190,34 @@
   .chip.active[data-group="ai"] { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
   .chip.active[data-group="ai"][data-val="全部"] { background: var(--surface2); color: var(--text); border-color: var(--border2); }
 
-  /* 程流 chip */
+  /* 程流 分組標題 */
+  .flow-group-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--flow);
+    letter-spacing: 0.08em;
+    margin: 1.5rem 0 0.6rem 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .flow-group-title::before {
+    content: '';
+    display: inline-block;
+    width: 10px; height: 10px;
+    background: var(--flow);
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .flow-group-title:first-child { margin-top: 0; }
+  .flow-group-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 0.5rem;
+  }
+
+
   .flow-chip:hover { border-color: var(--flow); color: var(--flow); }
   .flow-chip.active[data-val="全部"] { background: var(--surface2); color: var(--text); border-color: var(--border2); }
   .flow-chip.active:not([data-val="全部"]) { background: var(--flow-light); color: var(--flow); border-color: var(--flow); }
@@ -660,8 +687,8 @@
       </div>
     </div>
     <div class="stats-bar flow-stats" id="flowStatsBar"></div>
-    <div class="cards-grid" id="flowCardsGrid">
-      <div class="loading">
+    <div id="flowCardsGrid">
+      <div class="loading" style="text-align:center;padding:4rem 2rem;color:var(--text3);">
         <div class="loading-dot"></div>
         <div class="loading-dot"></div>
         <div class="loading-dot"></div>
@@ -892,7 +919,64 @@ function filterFlowCards() {
     }
     return true;
   });
-  renderCards(filtered, 'flowCardsGrid', 'flowStatsBar', true);
+  renderFlowGrouped(filtered);
+}
+
+function renderFlowGrouped(data) {
+  const grid = document.getElementById('flowCardsGrid');
+  document.getElementById('flowStatsBar').innerHTML = `共 <span>${data.length}</span> 個提示詞`;
+  window._filteredFlowData = data;
+
+  if (!data.length) {
+    grid.innerHTML = `<div class="empty">🔍<br><br>找不到符合條件的提示詞</div>`;
+    return;
+  }
+
+  // 依 task 分組，保留原始順序
+  const groups = {};
+  const groupOrder = [];
+  data.forEach((d, i) => {
+    const key = d.task || '其他';
+    if (!groups[key]) { groups[key] = []; groupOrder.push(key); }
+    groups[key].push({ d, i });
+  });
+
+  let html = '';
+  groupOrder.forEach(task => {
+    const items = groups[task];
+    html += `<div class="flow-group-title">${task}</div>`;
+    html += `<div class="flow-group-grid">`;
+    items.forEach(({ d, i }) => {
+      const modeTag = d.mode ? `<span class="tag ${getModeTag(d.mode)}">${d.mode}</span>` : '';
+      const aiTags = d.aiTool
+        ? d.aiTool.split(/[\/,、]+/).map(t=>t.trim()).filter(Boolean)
+            .map(t=>`<span class="tag tag-ai">${t}</span>`).join('')
+        : '';
+      const stepBadge = d.order ? `<span class="step-badge">步驟 ${d.order}</span>` : '';
+      const desc = d.content || d.desc || '';
+      html += `
+      <div class="card flow-card" onclick="openModal(${i}, true)">
+        <div class="card-top-bar flow-bar"></div>
+        <div class="card-inner">
+          <div class="card-tags">
+            <span class="tag tag-flow">${d.axis}</span>
+            ${modeTag}${aiTags}
+          </div>
+          <div class="card-task">${d.task || ''}</div>
+          <div class="card-title">${d.title}</div>
+          <div class="card-desc">${desc}</div>
+        </div>
+        <div class="card-footer">
+          ${stepBadge}
+          <button class="copy-btn flow-copy" onclick="event.stopPropagation();copyPrompt(this,${i},true)">📋 複製 Prompt</button>
+          <button class="card-edit-btn" onclick="event.stopPropagation();editPrompt(${i},true)" title="複製並開啟 Google Sheet">✏️</button>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+
+  grid.innerHTML = html;
 }
 
 function getAxisTag(axis) {
