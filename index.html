@@ -980,8 +980,8 @@ function buildFlowCard(d, i) {
         <span class="tag tag-flow">${d.axis}</span>
         ${modeTag}${aiTags}
       </div>
-      <div class="card-task">${d.code || d.task || ''}</div>
-      <div class="card-title">${d.title}</div>
+      <div class="card-task">${d.task || ''}</div>
+      <div class="card-title">${d.code || d.title}</div>
       <div class="card-desc">${desc}</div>
     </div>
     <div class="card-footer">
@@ -1049,8 +1049,8 @@ function renderCards(data, gridId, statsId, isFlow) {
       <div class="card-top-bar ${barClass}"></div>
       <div class="card-inner">
         <div class="card-tags">${axisTag}${modeTag}${aiTags}</div>
-        <div class="card-task">${d.code || d.task || ''}</div>
-        <div class="card-title">${d.title}</div>
+        <div class="card-task">${d.task || ''}</div>
+        <div class="card-title">${d.code || d.title}</div>
         <div class="card-desc">${desc}</div>
       </div>
       <div class="card-footer">
@@ -1170,8 +1170,8 @@ function openModal(idx, isFlow) {
   const d = isFlow ? window._filteredFlowData[idx] : window._filteredData[idx];
   _modalData = d;
   _modalIsFlow = isFlow;
-  document.getElementById('modalTitle').textContent = d.title;
-  document.getElementById('modalTask').textContent = d.code || d.task || '';
+  document.getElementById('modalTitle').textContent = d.code || d.title;
+  document.getElementById('modalTask').textContent = d.task || '';
   document.getElementById('modalPrompt').textContent = d.content;
 
   const descEl = document.getElementById('modalDesc');
