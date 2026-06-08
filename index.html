@@ -768,6 +768,7 @@ function parseCSV(text) {
   for (let i = 1; i < records.length; i++) {
     const cols = splitCSVLine(records[i]);
     if (!cols || cols.length < 7) continue;
+    const num    = clean(cols[1]);  // B欄（兩位數字）
     const axis   = clean(cols[2]);  // C欄
     const mode   = clean(cols[3]);  // D欄
     const task   = clean(cols[4]);  // E欄
@@ -778,8 +779,10 @@ function parseCSV(text) {
     const colJ   = clean(cols[9]);  // J欄
     const content = colI || colJ || '無';
     const desc = colI ? colJ : '';
+    const numPadded = num ? num.padStart(3, '0') : '';
+    const code = numPadded ? `${numPadded}-${title}` : title;
     if (!title) continue;
-    rows.push({ axis, mode, task, title, aiTool, order, content, desc });
+    rows.push({ axis, mode, task, title, aiTool, order, content, desc, code, num: numPadded });
   }
   return rows;
 }
@@ -977,7 +980,7 @@ function buildFlowCard(d, i) {
         <span class="tag tag-flow">${d.axis}</span>
         ${modeTag}${aiTags}
       </div>
-      <div class="card-task">${d.task || ''}</div>
+      <div class="card-task">${d.code || d.task || ''}</div>
       <div class="card-title">${d.title}</div>
       <div class="card-desc">${desc}</div>
     </div>
@@ -1046,7 +1049,7 @@ function renderCards(data, gridId, statsId, isFlow) {
       <div class="card-top-bar ${barClass}"></div>
       <div class="card-inner">
         <div class="card-tags">${axisTag}${modeTag}${aiTags}</div>
-        <div class="card-task">${d.task || ''}</div>
+        <div class="card-task">${d.code || d.task || ''}</div>
         <div class="card-title">${d.title}</div>
         <div class="card-desc">${desc}</div>
       </div>
@@ -1168,7 +1171,7 @@ function openModal(idx, isFlow) {
   _modalData = d;
   _modalIsFlow = isFlow;
   document.getElementById('modalTitle').textContent = d.title;
-  document.getElementById('modalTask').textContent = d.task || '';
+  document.getElementById('modalTask').textContent = d.code || d.task || '';
   document.getElementById('modalPrompt').textContent = d.content;
 
   const descEl = document.getElementById('modalDesc');
@@ -1218,8 +1221,9 @@ function closeModalOnOverlay(e) {
 // ─── Bug fix: editPrompt 複製完整 content ───
 function editPrompt(idx, isFlow) {
   const d = isFlow ? window._filteredFlowData[idx] : window._filteredData[idx];
-  navigator.clipboard.writeText(d.content).then(() => {
-    showToast('📋 已複製 Prompt，請在 Sheet 中按 Cmd+F 貼上搜尋');
+  const copyText = d.num || d.title;
+  navigator.clipboard.writeText(copyText).then(() => {
+    showToast(`📋 已複製「${copyText}」`);
     setTimeout(() => {
       window.open(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`, '_blank');
     }, 600);
@@ -1229,8 +1233,9 @@ function editPrompt(idx, isFlow) {
 // ─── Modal 編輯按鈕 ───
 function editModalPrompt() {
   if (!_modalData) return;
-  navigator.clipboard.writeText(_modalData.content).then(() => {
-    showToast('📋 已複製 Prompt，請在 Sheet 中按 Cmd+F 貼上搜尋');
+  const copyText = _modalData.num || _modalData.title;
+  navigator.clipboard.writeText(copyText).then(() => {
+    showToast(`📋 已複製「${copyText}」`);
     setTimeout(() => {
       window.open(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`, '_blank');
     }, 600);
