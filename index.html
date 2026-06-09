@@ -1254,7 +1254,17 @@ function copyModalPrompt() {
   });
 }
 
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); return; }
+  // 快速切換頁籤（輸入框或 Modal 開啟時不觸發）
+  const inInput = ['INPUT','TEXTAREA'].includes(document.activeElement.tagName);
+  const modalOpen = document.getElementById('modalOverlay').classList.contains('open');
+  if (!inInput && !modalOpen) {
+    if (e.key === '1') switchTab('prompt');
+    else if (e.key === '2') switchTab('flow');
+    else if (e.key === '3') switchTab('workflow');
+  }
+});
 
 init();
 </script>
